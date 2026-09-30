@@ -10,9 +10,12 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const url = typeof body.url === "string" ? body.url.trim() : "";
-    const projectName = typeof body.projectName === "string" && body.projectName.trim() ? body.projectName.trim() : new URL(url).hostname;
-    const category = categories.includes(body.category) ? body.category : "Other";
     if (!url) return NextResponse.json({ message: "A project URL is required." }, { status: 400 });
+    let parsedUrl: URL;
+    try { parsedUrl = new URL(url); } catch { return NextResponse.json({ message: "Enter a valid project URL." }, { status: 400 }); }
+    if (!["http:","https:"].includes(parsedUrl.protocol)) return NextResponse.json({ message: "Only HTTP and HTTPS URLs are supported." }, { status: 400 });
+    const projectName = typeof body.projectName === "string" && body.projectName.trim() ? body.projectName.trim() : parsedUrl.hostname;
+    const category = categories.includes(body.category) ? body.category : "Other";
 
     const verification = await fetch(new URL("/api/verify", new URL(request.url)).toString(), {
       method: "POST",
