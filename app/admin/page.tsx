@@ -50,8 +50,8 @@ export default function AdminPage(){
       const prData=await pr.json().catch(()=>({}));
       const suData=await su.json().catch(()=>({}));
       if(pr.ok && su.ok){
-        setProjects(Array.isArray(prData.projects)?prData.projects.map(normalizeProject).filter((p):p is Project=>p!==null):[]);
-        setSubmissions(Array.isArray(suData.submissions)?suData.submissions.map(normalizeSubmission).filter((s):s is Submission=>s!==null):[]);
+        setProjects(Array.isArray(prData.projects)?prData.projects.map((value: unknown)=>normalizeProject(value)).filter((p: Project | null): p is Project=>p!==null):[]);
+        setSubmissions(Array.isArray(suData.submissions)?suData.submissions.map((value: unknown)=>normalizeSubmission(value)).filter((s: Submission | null): s is Submission=>s!==null):[]);
         setAuthed(true);
         setError("");
       } else {
