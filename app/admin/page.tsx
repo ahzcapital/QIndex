@@ -106,12 +106,12 @@ export default function AdminPage(){
     setSaving(false);
   }
 
-  if(!authed)return <main><header className="nav shell"><Link href="/" className="brand-mark"><span className="brand-symbol">Q</span><span>QINDEX</span></Link></header><section className="admin-login shell"><div className="eyebrow">PRIVATE ADMIN</div><h1>QIndex<br/><em>Control room.</em></h1><form className="admin-login-form" onSubmit={login}><label>ADMIN PASSWORD</label><input autoFocus type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter your admin password"/>{error&&<div className="result error">{error}</div>}<button className="button">Enter admin →</button></form></section></main>;
-
   const filtered=useMemo(()=>projects.filter(p=>[p.projectName,p.url,p.category,p.description,p.hosting].join(" ").toLowerCase().includes(search.toLowerCase())),[projects,search]);
   const pending=submissions.filter(s=>s.status==="pending");
   const rejected=submissions.filter(s=>s.status==="rejected");
   const qstorage=projects.filter(p=>p.verificationStatus==="qstorage").length;
+
+  if(!authed)return <main><header className="nav shell"><Link href="/" className="brand-mark"><span className="brand-symbol">Q</span><span>QINDEX</span></Link></header><section className="admin-login shell"><div className="eyebrow">PRIVATE ADMIN</div><h1>QIndex<br/><em>Control room.</em></h1><form className="admin-login-form" onSubmit={login}><label>ADMIN PASSWORD</label><input autoFocus type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter your admin password"/>{error&&<div className="result error">{error}</div>}<button className="button">Enter admin →</button></form></section></main>;
 
   function openEdit(p:Project){setSelected(p);setAdding(false);setForm({projectName:p.projectName,url:p.url,slug:p.slug,category:p.category,description:p.description||"",githubUrl:p.githubUrl||"",verificationStatus:p.verificationStatus||"unverified",finalUrl:p.finalUrl||"",httpStatus:p.httpStatus??"",responseTimeMs:p.responseTimeMs??"",hosting:p.hosting||""});setTab("projects");setSelectedSubmission(null)}
 
