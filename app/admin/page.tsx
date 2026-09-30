@@ -15,18 +15,35 @@ export default function AdminPage(){
   const [tab,setTab]=useState("overview"),[selected,setSelected]=useState<Project|null>(null),[form,setForm]=useState<any>(blank),[adding,setAdding]=useState(false),[saving,setSaving]=useState(false),[error,setError]=useState(""),[search,setSearch]=useState("");
 
   async function load(){
-    const [pr,su]=await Promise.all([fetch("/api/admin/projects"),fetch("/api/admin/submissions")]);
-    if(pr.ok&&su.ok){setProjects((await pr.json()).projects||[]);setSubmissions((await su.json()).submissions||[]);setAuthed(true)}
-    else setAuthed(false);
+    try {
+      const [pr,su]=await Promise.all([
+        fetch("/api/admin/projects",{cache:"no-store"}),
+        fetch("/api/admin/submissions",{cache:"no-store"})
+      ]);
+      const prData = await pr.json().catch(()=>({}));
+      const suData = await su.json().catch(()=>({}));
+      if(pr.ok && su.ok){
+        setProjects(Array.isArray(prData.projects) ? prData.projects : []);
+        setSubmissions(Array.isArray(suData.submissions) ? suData.submissions : []);
+        setAuthed(true);
+        setError("");
+      } else {
+        setAuthed(false);
+        setError(prData.message || suData.message || "Admin session could not be loaded.");
+      }
+    } catch {
+      setAuthed(false);
+      setError("Could not connect to the QIndex admin API.");
+    }
   }
-  useEffect(()=>{load()},[]);
+  useEffect(()=>{ void load(); },[]);
 
   async function login(e:React.FormEvent){e.preventDefault();setError("");const r=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password})});if(!r.ok){setError((await r.json()).message);return}setPassword("");await load()}
   async function saveProject(e:React.FormEvent){
     e.preventDefault();setSaving(true);setError("");
     const endpoint=selected?"/api/admin/projects/"+selected.id:"/api/admin/projects";
     const r=await fetch(endpoint,{method:selected?"PATCH":"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(form)});
-    const d=await r.json();
+    const d=await r.json().catch(()=>({}));
     if(!r.ok)setError(d.message||"Could not save.");else{setAdding(false);setSelected(null);setForm(blank);await load()}
     setSaving(false);
   }
@@ -34,12 +51,12 @@ export default function AdminPage(){
     if(action==="delete"&&!window.confirm("Delete this project from QIndex? The public record will disappear."))return;
     setSaving(true);setError("");
     const r=await fetch("/api/admin/projects/"+id,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action})});
-    const d=await r.json();if(!r.ok)setError(d.message||"Action failed.");else await load();setSaving(false);
+    const d=await r.json().catch(()=>({}));if(!r.ok)setError(d.message||"Action failed.");else await load();setSaving(false);
   }
   async function decide(id:string,status:"approved"|"rejected"){
     setSaving(true);setError("");
     const r=await fetch("/api/admin/submissions/"+id,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status})});
-    const d=await r.json();if(!r.ok)setError(d.message||"Review failed.");else await load();setSaving(false);
+    const d=await r.json().catch(()=>({}));if(!r.ok)setError(d.message||"Review failed.");else await load();setSaving(false);
   }
 
   if(!authed)return <main><header className="nav shell"><Link href="/" className="brand-mark"><span className="brand-symbol">Q</span><span>QINDEX</span></Link></header><section className="admin-login shell"><div className="eyebrow">PRIVATE ADMIN</div><h1>QIndex<br/><em>Control room.</em></h1><form className="admin-login-form" onSubmit={login}><label>ADMIN PASSWORD</label><input autoFocus type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter your admin password"/>{error&&<div className="result error">{error}</div>}<button className="button">Enter admin →</button></form></section></main>;
