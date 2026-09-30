@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "QIndex — Public ecosystem index",
-  description: "A quiet, technical index of publicly discoverable projects connected to the Quilibrium ecosystem.",
-  themeColor: "#050505",
+  title: "QIndex — The Quilibrium Web Index",
+  description: "A public index of discoverable websites, applications, tools and projects connected to the Quilibrium ecosystem.",
+  themeColor: "#070707",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
