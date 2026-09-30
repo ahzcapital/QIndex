@@ -13,7 +13,7 @@ type Project = {
   hosting: string;
 };
 
-const categories = ["All", "Infrastructure", "Tools", "Developer", "AI", "Finance", "Gaming", "Research", "Other"];
+const categories = ["All", "Apps", "Developer & Tools", "AI", "Finance", "Social", "Media & Journalism", "Infrastructure", "Personal", "Business", "Other"];
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
