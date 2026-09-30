@@ -40,7 +40,7 @@ export default function SubmitPage() {
         <div className="field"><label>PROJECT URL <span>*</span></label><input required type="url" value={form.url} onChange={e=>setForm({...form,url:e.target.value})} placeholder="https://example.qstorage.quilibrium.com"/><small>The public URL visitors can open without authentication.</small></div>
         <div className="form-grid">
           <div className="field"><label>PROJECT NAME</label><input value={form.projectName} onChange={e=>setForm({...form,projectName:e.target.value})} placeholder="Project name"/></div>
-          <div className="field"><label>CATEGORY</label><select value={form.category} onChange={e=>setForm({...form,category:e.target.value})}>{["Other","Infrastructure","Tools","Developer","AI","Finance","Gaming","Research"].map(x=><option key={x}>{x}</option>)}</select></div>
+          <div className="field"><label>CATEGORY</label><select value={form.category} onChange={e=>setForm({...form,category:e.target.value})}>{["Other","Apps","Developer & Tools","AI","Finance","Social","Media & Journalism","Infrastructure","Personal","Business"].map(x=><option key={x}>{x}</option>)}</select></div>
         </div>
         <div className="field"><label>DESCRIPTION</label><textarea rows={5} value={form.description} onChange={e=>setForm({...form,description:e.target.value})} placeholder="What exists here? What does it do?"/></div>
         <div className="field"><label>GITHUB <span>(OPTIONAL)</span></label><input value={form.githubUrl} onChange={e=>setForm({...form,githubUrl:e.target.value})} placeholder="https://github.com/..."/></div>
