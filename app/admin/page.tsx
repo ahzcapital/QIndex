@@ -39,7 +39,7 @@ function normalizeSubmission(value: unknown): Submission | null {
 
 export default function AdminPage(){
   const [authed,setAuthed]=useState(false),[password,setPassword]=useState(""),[projects,setProjects]=useState<Project[]>([]),[submissions,setSubmissions]=useState<Submission[]>([]);
-  const [tab,setTab]=useState("overview"),[selected,setSelected]=useState<Project|null>(null),[form,setForm]=useState<any>(blank),[adding,setAdding]=useState(false),[saving,setSaving]=useState(false),[error,setError]=useState(""),[search,setSearch]=useState("");
+  const [tab,setTab]=useState("overview"),[selected,setSelected]=useState<Project|Submission|null>(null),[form,setForm]=useState<any>(blank),[adding,setAdding]=useState(false),[saving,setSaving]=useState(false),[error,setError]=useState(""),[search,setSearch]=useState("");
 
   async function load(){
     try {
