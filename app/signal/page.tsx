@@ -2,6 +2,7 @@ import Link from "next/link";
 import { pool } from "@/lib/db";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export default async function SignalPage() {
   const r = await pool.query(`select count(*)::int as total, count(*) filter (where verification_status='qstorage')::int as qstorage from projects`);
