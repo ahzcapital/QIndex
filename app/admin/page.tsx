@@ -6,7 +6,7 @@ import Link from "next/link";
 type Project={id:string;slug:string;projectName:string;url:string;category:string;description:string;githubUrl:string;verificationStatus:string;finalUrl:string;httpStatus:number|null;responseTimeMs:number|null;hosting:string;createdAt?:string;updatedAt?:string};
 type Submission=Project & {status:string;reviewNote?:string;createdAt:string;reviewedAt?:string};
 
-const categories=["Other","Infrastructure","Developer & Tools","AI","Finance","Social","Media & Journalism","Personal","Business"];
+const categories=["Apps","Developer & Tools","AI","Finance","Social","Media & Journalism","Infrastructure","Personal","Business","Other"];
 
 const blank={projectName:"",url:"",slug:"",category:"Other",description:"",githubUrl:"",verificationStatus:"unverified",finalUrl:"",httpStatus:"",responseTimeMs:"",hosting:""};
 
