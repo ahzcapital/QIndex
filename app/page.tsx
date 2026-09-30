@@ -62,7 +62,7 @@ export default function Home() {
 
   const count = projects.length;
   const qstorageCount = projects.filter((p) => p.verificationStatus === "qstorage").length;
-  const verifiedCount = projects.filter((p) => p.verificationStatus === "qstorage").length;
+  const verifiedCount = projects.length;
 
   return (
     <main className="site-stage" ref={root}>
