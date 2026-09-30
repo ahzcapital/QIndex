@@ -49,3 +49,37 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({message:"Could not update the project."},{status:500});
   } finally { client.release(); }
 }
+
+
+export async function POST(request: Request,{params}:{params:Promise<{id:string}>}) {
+  if (!(await requireAdmin())) return NextResponse.json({message:"Unauthorized."},{status:401});
+  const {id}=await params;
+  const body=await request.json();
+  const action=body.action;
+  const client=await pool.connect();
+  try {
+    await client.query("begin");
+    const found=await client.query("select * from projects where id=$1 for update",[id]);
+    if(!found.rowCount) return NextResponse.json({message:"Project not found."},{status:404});
+    const p=found.rows[0];
+    if(action==="delete" || action==="unpublish" || action==="archive"){
+      if(p.submission_id){
+        const marker=action==="unpublish"?"UNPUBLISHED_BY_ADMIN":"ARCHIVED_BY_ADMIN";
+        await client.query("update submissions set status='rejected',review_note=$1,reviewed_at=now() where id=$2",[marker,p.submission_id]);
+      }
+      await client.query("delete from projects where id=$1",[id]);
+      await client.query("commit");
+      return NextResponse.json({ok:true,action});
+    }
+    if(action==="publish"){
+      if(p.submission_id) await client.query("update submissions set status='approved',review_note='PUBLISHED_BY_ADMIN',reviewed_at=now() where id=$1",[p.submission_id]);
+      await client.query("commit");
+      return NextResponse.json({ok:true,action});
+    }
+    await client.query("rollback");
+    return NextResponse.json({message:"Unknown action."},{status:400});
+  } catch {
+    await client.query("rollback");
+    return NextResponse.json({message:"Could not change project state."},{status:500});
+  } finally { client.release(); }
+}
