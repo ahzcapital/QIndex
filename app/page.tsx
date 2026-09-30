@@ -1,31 +1,14 @@
 "use client";
-import {useMemo,useState} from "react";
-import Link from "next/link";
-
-type Project={slug:string;name:string;description:string;url:string;category:string;type:string;verified:boolean;status:"Online"|"Offline"|"Unknown";tags:string[]};
-const projects:Project[]=[];
+import {useEffect,useMemo,useState} from "react"; import Link from "next/link";
+type Project={slug:string;name:string;description:string;url:string;category:string;verificationStatus:string;hosting:string};
 const categories=["All","Infrastructure","Tools","Developer","AI","Finance","Gaming","Research"];
-
 export default function Home(){
- const [query,setQuery]=useState(""); const [category,setCategory]=useState("All"); const [verifiedOnly,setVerifiedOnly]=useState(false);
- const filtered=useMemo(()=>{const q=query.trim().toLowerCase();return projects.filter(p=>{
-  const mq=!q||[p.name,p.description,p.url,p.category,p.type,...p.tags].join(" ").toLowerCase().includes(q);
-  return mq&&(category==="All"||p.category===category)&&(!verifiedOnly||p.verified);
- });},[query,category,verifiedOnly]);
- return <main>
-  <header className="nav shell"><Link href="/" className="brand">QINDEX<span>.</span></Link><nav><a href="#explore">Explore</a><Link href="/submit">Submit</Link><a href="#about">About</a></nav></header>
-  <section className="hero shell"><div className="eyebrow"><span className="pulse"/> PUBLIC ECOSYSTEM INDEX</div>
-   <h1>Discover what is<br/><em>being built on Quilibrium.</em></h1>
-   <p className="hero-copy">QIndex is a community-powered directory of publicly discoverable websites, applications, tools and projects connected to the Quilibrium ecosystem.</p>
-   <div className="search-box"><span className="search-icon">⌕</span><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search projects, tools, websites..." aria-label="Search projects"/><kbd>⌘ K</kbd></div>
-   <div className="stats"><div><strong>{projects.length}</strong><span>Indexed projects</span></div><div><strong>8</strong><span>Categories</span></div><div><strong>Open</strong><span>Community submissions</span></div></div>
-  </section>
-  <section className="explore shell" id="explore"><div className="section-head"><div><div className="eyebrow">EXPLORE</div><h2>The index</h2></div><Link href="/submit" className="button secondary">+ Submit a project</Link></div>
-   <div className="filters"><div className="category-scroll">{categories.map(c=><button key={c} className={category===c?"filter active":"filter"} onClick={()=>setCategory(c)}>{c}</button>)}</div><label className="check"><input type="checkbox" checked={verifiedOnly} onChange={e=>setVerifiedOnly(e.target.checked)}/><span/> Verified only</label></div>
-   <div className="results-meta"><span>{filtered.length} {filtered.length===1?"project":"projects"}</span><span>Publicly discoverable</span></div>
-   {filtered.length>0?<div className="grid">{filtered.map((p,i)=><Link href={"/project/"+p.slug} className="project-card" key={p.slug}><div className={"card-preview preview-"+i%3}><div className="preview-window"><div className="window-bar"><i/><i/><i/></div><div className="preview-lines"><b/><b/><b/><span/></div></div><span className="open-mark">↗</span></div><div className="card-body"><div className="card-top"><div><h3>{p.name}</h3><span className="url">{p.url.replace("https://","")}</span></div>{p.verified&&<span className="verified">✓ Verified</span>}</div><p>{p.description}</p><div className="card-footer"><span>{p.category}</span><span className={p.status==="Online"?"online":""}>● {p.status}</span></div></div></Link>)}</div>:<div className="empty"><span>Q</span><h3>The index is being seeded.</h3><p>No public projects have been published yet. Be one of the first to suggest a project.</p><Link href="/submit" className="button">Suggest a project →</Link></div>}
-  </section>
-  <section className="submit-band" id="about"><div className="shell split"><div><div className="eyebrow">COMMUNITY DISCOVERY</div><h2>Know a project<br/>we haven't indexed?</h2></div><div><p>Anyone can suggest a publicly accessible project. QIndex checks the submitted URL before it enters the review queue.</p><Link href="/submit" className="button">Submit a project <span>→</span></Link></div></div></section>
-  <footer className="shell footer"><span>QINDEX © 2026</span><span>Independent ecosystem directory</span></footer>
- </main>;
+ const [projects,setProjects]=useState<Project[]>([]),[query,setQuery]=useState(""),[category,setCategory]=useState("All"),[verifiedOnly,setVerifiedOnly]=useState(false);
+ useEffect(()=>{fetch("/api/projects").then(r=>r.json()).then(d=>setProjects(d.projects||[])).catch(()=>{})},[]);
+ const filtered=useMemo(()=>{const q=query.trim().toLowerCase();return projects.filter(p=>{const mq=!q||[p.name,p.description||"",p.url,p.category].join(" ").toLowerCase().includes(q);return mq&&(category==="All"||p.category===category)&&(!verifiedOnly||p.verificationStatus==="qstorage")})},[projects,query,category,verifiedOnly]);
+ return <main><header className="nav shell"><Link href="/" className="brand">QINDEX<span>.</span></Link><nav><a href="#explore">Explore</a><Link href="/submit">Submit</Link><a href="#about">About</a></nav></header>
+ <section className="hero shell"><div className="eyebrow"><span className="pulse"/> PUBLIC ECOSYSTEM INDEX</div><h1>Discover what is<br/><em>being built on Quilibrium.</em></h1><p className="hero-copy">QIndex is a community-powered directory of publicly discoverable websites, applications, tools and projects connected to the Quilibrium ecosystem.</p><div className="search-box"><span className="search-icon">⌕</span><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search projects, tools, websites..." aria-label="Search projects"/><kbd>⌘ K</kbd></div><div className="stats"><div><strong>{projects.length}</strong><span>Indexed projects</span></div><div><strong>8</strong><span>Categories</span></div><div><strong>Open</strong><span>Community submissions</span></div></div></section>
+ <section className="explore shell" id="explore"><div className="section-head"><div><div className="eyebrow">EXPLORE</div><h2>The index</h2></div><Link href="/submit" className="button secondary">+ Submit a project</Link></div><div className="filters"><div className="category-scroll">{categories.map(c=><button key={c} className={category===c?"filter active":"filter"} onClick={()=>setCategory(c)}>{c}</button>)}</div><label className="check"><input type="checkbox" checked={verifiedOnly} onChange={e=>setVerifiedOnly(e.target.checked)}/><span/> Verified only</label></div><div className="results-meta"><span>{filtered.length} {filtered.length===1?"project":"projects"}</span><span>Publicly discoverable</span></div>
+ {filtered.length>0?<div className="grid">{filtered.map((p,i)=><Link href={"/project/"+p.slug} className="project-card" key={p.slug}><div className={"card-preview preview-"+i%3}><div className="preview-window"><div className="window-bar"><i/><i/><i/></div><div className="preview-lines"><b/><b/><b/><span/></div></div><span className="open-mark">↗</span></div><div className="card-body"><div className="card-top"><div><h3>{p.name}</h3><span className="url">{p.url.replace(/^https?:\/\//,"")}</span></div>{p.verificationStatus==="qstorage"&&<span className="verified">✓ QStorage</span>}</div><p>{p.description||"No description provided."}</p><div className="card-footer"><span>{p.category}</span><span className="online">● Indexed</span></div></div></Link>)}</div>:<div className="empty"><span>Q</span><h3>The index is being seeded.</h3><p>No public projects have been published yet. Be one of the first to suggest a project.</p><Link href="/submit" className="button">Suggest a project →</Link></div>}</section>
+ <section className="submit-band" id="about"><div className="shell split"><div><div className="eyebrow">COMMUNITY DISCOVERY</div><h2>Know a project<br/>we haven't indexed?</h2></div><div><p>Anyone can suggest a publicly accessible project. QIndex checks the submitted URL before it enters the review queue.</p><Link href="/submit" className="button">Submit a project <span>→</span></Link></div></div></section><footer className="shell footer"><span>QINDEX © 2026</span><span>Independent ecosystem directory</span></footer></main>;
 }
