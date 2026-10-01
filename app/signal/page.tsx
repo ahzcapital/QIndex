@@ -9,17 +9,17 @@ export default async function SignalPage() {
   const stats = r.rows[0] || { total: 0, qstorage: 0 };
 
   return <main className="site-stage">
-    <div className="ambient ambient-a"/><div className="grain"/>
+    <div className="ambient ambient-a"/><div className="ambient ambient-b"/><div className="grain"/>
     <header className="nav shell">
       <Link href="/" className="brand-mark"><span className="brand-symbol">Q</span><span>QINDEX</span></Link>
       <nav className="nav-links"><Link href="/#index">Explore</Link><Link href="/#categories">Categories</Link><Link href="/signal">Signal</Link><Link href="/submit">Submit</Link></nav>
-      <span className="nav-state"><i/> OBSERVATORY</span>
+      <span className="nav-state"><i className="ping-dot"/> OBSERVATORY</span>
     </header>
 
-    <section className="signal-page shell">
+    <section className="signal-page shell fade-up">
       <Link href="/" className="back">← Back to QIndex</Link>
       <div className="eyebrow">QINDEX / SIGNAL</div>
-      <h1>What we can observe,<br/><span>and what we cannot.</span></h1>
+      <h1>What we can observe,<br/><span className="grad-text">and what we cannot.</span></h1>
       <p className="lead">QIndex is a public directory built from observable web endpoints and human review. Technical signals describe an endpoint; they do not establish ownership, quality or endorsement.</p>
 
       <div className="stats" style={{marginBottom:80}}>
