@@ -111,15 +111,15 @@ export default function AdminPage(){
   const rejected=submissions.filter(s=>s.status==="rejected");
   const qstorage=projects.filter(p=>p.verificationStatus==="qstorage").length;
 
-  if(!authed)return <main><header className="nav shell"><Link href="/" className="brand-mark"><span className="brand-symbol">Q</span><span>QINDEX</span></Link></header><section className="admin-login shell"><div className="eyebrow">PRIVATE ADMIN</div><h1>QIndex<br/><em>Control room.</em></h1><form className="admin-login-form" onSubmit={login}><label>ADMIN PASSWORD</label><input autoFocus type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter your admin password"/>{error&&<div className="result error">{error}</div>}<button className="button">Enter admin →</button></form></section></main>;
+  if(!authed)return <main className="site-stage"><div className="ambient ambient-a"/><div className="ambient ambient-b"/><div className="grain"/><header className="nav shell"><Link href="/" className="brand-mark"><span className="brand-symbol">Q</span><span>QINDEX</span></Link><span className="nav-state" style={{marginLeft:"auto"}}><i className="ping-dot"/> RESTRICTED</span></header><section className="admin-login shell fade-up"><div className="eyebrow">PRIVATE ADMIN</div><h1>QIndex<br/><em className="grad-text">Control room.</em></h1><form className="admin-login-form" onSubmit={login}><label>ADMIN PASSWORD</label><input autoFocus type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter your admin password"/>{error&&<div className="result error">{error}</div>}<button className="button">Enter admin →</button></form></section></main>;
 
   function openEdit(p:Project){setSelected(p);setAdding(false);setForm({projectName:p.projectName,url:p.url,slug:p.slug,category:p.category,description:p.description||"",githubUrl:p.githubUrl||"",verificationStatus:p.verificationStatus||"unverified",finalUrl:p.finalUrl||"",httpStatus:p.httpStatus??"",responseTimeMs:p.responseTimeMs??"",hosting:p.hosting||""});setTab("projects");setSelectedSubmission(null)}
 
   return <main className="site-stage">
-    <div className="ambient ambient-a"/><div className="grain"/>
-    <header className="nav shell"><Link href="/" className="brand-mark"><span className="brand-symbol">Q</span><span>QINDEX</span></Link><nav className="nav-links"><Link href="/">Public index</Link><button className="text-button" onClick={async()=>{await fetch("/api/admin/logout",{method:"POST"});setAuthed(false)}}>Sign out</button></nav><span className="nav-state"><i/> ADMIN</span></header>
+    <div className="ambient ambient-a"/><div className="ambient ambient-b"/><div className="grain"/>
+    <header className="nav shell"><Link href="/" className="brand-mark"><span className="brand-symbol">Q</span><span>QINDEX</span></Link><nav className="nav-links"><Link href="/">Public index</Link><button className="text-button" onClick={async()=>{await fetch("/api/admin/logout",{method:"POST"});setAuthed(false)}}>Sign out</button></nav><span className="nav-state"><i className="ping-dot"/> ADMIN</span></header>
 
-    <section className="admin shell">
+    <section className="admin shell fade-up">
       <div className="admin-head"><div><div className="eyebrow">QINDEX ADMIN / EDITORIAL CMS</div><h1>Control room.</h1><p>Curate the canonical public index. Users propose records; you decide what becomes public.</p></div><div className="admin-count"><strong>{projects.length}</strong><span>published records</span></div></div>
 
       <div className="admin-nav">{["overview","projects","submissions"].map(x=><button key={x} className={tab===x?"active":""} onClick={()=>{setTab(x);setSelected(null);setAdding(false)}}>{x.toUpperCase()}</button>)}<button className="admin-add" onClick={()=>{setTab("projects");setSelected(null);setAdding(true);setForm({...blank})}}>+ ADD PROJECT</button></div>

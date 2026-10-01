@@ -18,14 +18,14 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const indexed = new Date(p.created_at).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}).toUpperCase();
 
   return <main className="site-stage">
-    <div className="ambient ambient-a"/><div className="grain"/>
+    <div className="ambient ambient-a"/><div className="ambient ambient-b"/><div className="grain"/>
     <header className="nav shell">
       <Link href="/" className="brand-mark"><span className="brand-symbol">Q</span><span>QINDEX</span></Link>
       <nav className="nav-links"><Link href="/#index">Explore</Link><Link href="/#categories">Categories</Link><Link href="/signal">Signal</Link><Link href="/submit">Submit</Link></nav>
-      <span className="nav-state"><i/> PUBLIC RECORD</span>
+      <span className="nav-state"><i className="ping-dot"/> PUBLIC RECORD</span>
     </header>
 
-    <section className="project-hero shell">
+    <section className="project-hero shell fade-up">
       <Link href="/" className="back">← Back to QIndex</Link>
       <div className="project-labels">{qstorage&&<span className="verified">QSTORAGE SIGNAL</span>}<span>PUBLIC RECORD</span><span>{p.category}</span></div>
       <h1>{p.name}</h1>
@@ -33,7 +33,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       <a className="button" href={p.url} target="_blank" rel="noreferrer">OPEN PROJECT ↗</a>
     </section>
 
-    <section className="shell project-layout">
+    <section className="shell project-layout fade-up-d1">
       <div className="site-frame">
         <div className="frame-bar"><span>{p.url}</span><span>EXTERNAL</span></div>
         <div className="frame-placeholder"><div><span>QINDEX RECORD</span><strong>{p.name}</strong></div></div>
@@ -48,7 +48,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       </aside>
     </section>
 
-    <section className="shell claim-box">
+    <section className="shell claim-box fade-up-d2">
       <div><div className="eyebrow">OWNERSHIP / UPDATES</div><h2>Is this record yours?</h2><p>Owner claiming is not enabled yet. Corrections and updates currently move through the public submission and review channel.</p></div>
       <Link href="/submit" className="button">SUGGEST AN UPDATE ↗</Link>
     </section>
