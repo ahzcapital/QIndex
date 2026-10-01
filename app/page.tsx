@@ -20,6 +20,7 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [animRows, setAnimRows] = useState(true);
   const root = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -28,8 +29,19 @@ export default function Home() {
       .then((d) => setProjects(d.projects || []))
       .catch(() => {});
 
+    const t = setTimeout(() => setAnimRows(false), 1600);
+
     const node = root.current;
-    if (!node || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("in")),
+      { threshold: 0.12 }
+    );
+    node?.querySelectorAll("[data-reveal]").forEach((el) => io.observe(el));
+
+    if (!node || reduced) return () => { clearTimeout(t); io.disconnect(); };
+
     let tx = 0, ty = 0, x = 0, y = 0, raf = 0;
     const move = (e: MouseEvent) => {
       tx = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -45,6 +57,8 @@ export default function Home() {
     window.addEventListener("mousemove", move, { passive: true });
     raf = requestAnimationFrame(frame);
     return () => {
+      clearTimeout(t);
+      io.disconnect();
       window.removeEventListener("mousemove", move);
       cancelAnimationFrame(raf);
     };
@@ -67,6 +81,7 @@ export default function Home() {
   return (
     <main className="site-stage" ref={root}>
       <div className="ambient ambient-a" />
+      <div className="ambient ambient-b" />
       <div className="grain" />
 
       <header className="nav shell">
@@ -80,24 +95,38 @@ export default function Home() {
           <Link href="/signal">Signal</Link>
           <Link href="/submit">Submit</Link>
         </nav>
-        <span className="nav-state"><i /> PUBLIC INDEX</span>
+        <span className="nav-state"><i className="ping-dot" /> PUBLIC INDEX</span>
       </header>
 
       <section className="intro shell">
-        <div className="intro-kicker">Q / PUBLIC ECOSYSTEM INDEX</div>
-        <h1>The Quilibrium<br /><span>web index.</span></h1>
-        <p>Discover publicly accessible websites, applications, tools and projects connected to the Quilibrium ecosystem.</p>
-        <a href="#index" className="primary-link">Explore the index <span>↓</span></a>
+        <div className="fade-up">
+          <div className="intro-kicker">Q / PUBLIC ECOSYSTEM INDEX</div>
+          <h1>The Quilibrium<br /><span className="grad-text">web index.</span></h1>
+          <p>Discover publicly accessible websites, applications, tools and projects connected to the Quilibrium ecosystem.</p>
+          <div className="intro-actions">
+            <a href="#index" className="btn-primary">Explore the index <span>↓</span></a>
+            <Link href="/signal" className="btn-outline">Read the signal</Link>
+          </div>
+        </div>
+
+        <div className="orb-wrap fade-up-d1" aria-hidden="true">
+          <div className="orbit o1"><div className="orbit-ring"><i /></div></div>
+          <div className="orbit o2"><div className="orbit-ring"><i /></div></div>
+          <div className="orbit o3"><div className="orbit-ring" /></div>
+          <div className="orb-core" />
+          <div className="orb-chip chip-a"><strong>{count.toLocaleString()}</strong><span>PROJECTS</span></div>
+          <div className="orb-chip chip-b"><strong>{qstorageCount.toLocaleString()}</strong><span>QSTORAGE</span></div>
+        </div>
       </section>
 
-      <section className="stats shell" aria-label="Index statistics">
+      <section className="stats shell" aria-label="Index statistics" data-reveal>
         <div><strong>{count.toLocaleString()}</strong><span>PUBLIC PROJECTS</span></div>
         <div><strong>{qstorageCount.toLocaleString()}</strong><span>QSTORAGE SIGNALS</span></div>
         <div><strong>{verifiedCount.toLocaleString()}</strong><span>REVIEWED RECORDS</span></div>
         <div><strong>{categories.length - 1}</strong><span>CATEGORIES</span></div>
       </section>
 
-      <section className="index-section shell" id="index">
+      <section className="index-section shell" id="index" data-reveal>
         <div className="section-heading">
           <div><span className="section-number">01</span><span>EXPLORE</span></div>
           <p>{filtered.length.toLocaleString()} {filtered.length === 1 ? "result" : "results"}</p>
@@ -129,7 +158,12 @@ export default function Home() {
         {filtered.length ? (
           <div className="project-list">
             {filtered.map((p, i) => (
-              <Link href={"/project/" + p.slug} className="project-row" key={p.slug}>
+              <Link
+                href={"/project/" + p.slug}
+                className={"project-row" + (animRows ? " row-enter" : "")}
+                style={animRows ? { animationDelay: `${Math.min(i, 12) * 55}ms` } : undefined}
+                key={p.slug}
+              >
                 <span className="row-index">{String(i + 1).padStart(3, "0")}</span>
                 <span className="row-name"><strong>{p.name}</strong><small>{p.url.replace(/^https?:\/\//, "")}</small></span>
                 <span className="row-category">{p.category}</span>
@@ -147,7 +181,7 @@ export default function Home() {
         )}
       </section>
 
-      <section className="category-section shell" id="categories">
+      <section className="category-section shell" id="categories" data-reveal>
         <div className="section-heading"><div><span className="section-number">02</span><span>CATEGORIES</span></div><p>Browse the index by type.</p></div>
         <div className="category-grid">
           {categories.slice(1).map((c) => {
@@ -161,11 +195,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="method-section">
+      <section className="method-section" data-reveal>
         <div className="shell method-layout">
           <div className="section-heading"><div><span className="section-number">03</span><span>METHOD</span></div><Link href="/signal" className="secondary-link">Read the signal page ↗</Link></div>
           <div className="method-copy">
-            <h2>A public record,<br />not an endorsement.</h2>
+            <h2>A public record,<br /><span className="grad-text">not an endorsement.</span></h2>
             <p>QIndex separates what a machine can observe from what a human has reviewed. A reachable URL is a technical observation. A QStorage signal is a hosting clue. Publication follows review.</p>
             <div className="method-steps">
               <div><span>01</span><strong>CHECK</strong><p>Reachability, redirects and visible hosting signals.</p></div>
@@ -176,10 +210,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="submit-strip shell">
+      <section className="submit-strip shell" data-reveal>
         <span className="section-number">04</span>
-        <div><span className="eyebrow">OPEN SUBMISSION</span><h2>Know something<br /><span>missing?</span></h2></div>
-        <div><p>Suggest a publicly accessible project. It will be checked and reviewed before publication.</p><Link href="/submit" className="primary-link">Submit a project ↗</Link></div>
+        <div><span className="eyebrow">OPEN SUBMISSION</span><h2>Know something<br /><span className="grad-text">missing?</span></h2></div>
+        <div><p>Suggest a publicly accessible project. It will be checked and reviewed before publication.</p><Link href="/submit" className="btn-primary">Submit a project ↗</Link></div>
       </section>
 
       <footer className="footer shell"><span>QINDEX / 2026</span><span>AN INDEPENDENT PUBLIC ECOSYSTEM INDEX</span><span>Q / END</span></footer>
