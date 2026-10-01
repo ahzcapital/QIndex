@@ -23,17 +23,17 @@ export default function SubmitPage() {
   }
 
   return <main className="site-stage">
-    <div className="ambient ambient-a"/><div className="grain"/>
+    <div className="ambient ambient-a"/><div className="ambient ambient-b"/><div className="grain"/>
     <header className="nav shell">
       <Link href="/" className="brand-mark"><span className="brand-symbol">Q</span><span>QINDEX</span></Link>
       <nav className="nav-links"><Link href="/#index">Explore</Link><Link href="/#categories">Categories</Link><Link href="/signal">Signal</Link><Link href="/submit">Submit</Link></nav>
-      <span className="nav-state"><i/> SUBMISSION</span>
+      <span className="nav-state"><i className="ping-dot"/> SUBMISSION</span>
     </header>
 
-    <section className="submit-page shell">
+    <section className="submit-page shell fade-up">
       <Link href="/" className="back">← Back to QIndex</Link>
       <div className="eyebrow">PUBLIC SUBMISSION</div>
-      <h1>Add a project<br/><em>to the index.</em></h1>
+      <h1>Add a project<br/><em className="grad-text">to the index.</em></h1>
       <p className="lead">Submit a publicly accessible website, application, tool or experiment. The URL is checked first; publication follows human review.</p>
 
       <form className="submission-form" onSubmit={submit}>
