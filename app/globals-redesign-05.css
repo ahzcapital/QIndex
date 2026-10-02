@@ -1,7 +1,7 @@
 
 @media(max-width:620px){
   .shell{width:calc(100% - 28px)}
-  .nav{height:68px}
+  .nav{height:68px;position:relative}
   .nav-links{gap:13px}
   .nav-links a:nth-child(2){display:none}
   .nav-state{display:none}
@@ -84,39 +84,52 @@
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  gap:12px;
-  min-height:40px;
-  padding:7px 14px;
+  gap:10px;
   white-space:nowrap;
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:2px;
-  background:rgba(9,10,10,.72);
-  box-shadow:0 8px 24px rgba(0,0,0,.16);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
   font-family:var(--mono,ui-monospace,SFMono-Regular,Menlo,monospace);
-  font-size:8px;
-  letter-spacing:.12em;
-  color:rgba(255,255,255,.5);
+  font-size:7px;
+  line-height:1;
+  letter-spacing:.11em;
+  color:rgba(255,255,255,.38);
   pointer-events:none;
 }
 .visitor-counter strong{
-  font-size:20px;
+  font-size:17px;
   line-height:1;
   font-weight:600;
-  letter-spacing:-.03em;
-  color:#fff;
-  min-width:28px;
+  letter-spacing:-.025em;
+  color:rgba(255,255,255,.88);
+  min-width:20px;
   text-align:center;
 }
-.visitor-label{color:rgba(255,255,255,.5)}
-.visitor-live{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.36);font-size:7px;letter-spacing:.12em}
-.visitor-live i{width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block}
-.visitor-live.is-live{color:#8bbf9a}
+.visitor-label{color:rgba(255,255,255,.38)}
+.visitor-label b{font-weight:400;color:rgba(255,255,255,.25)}
+.visitor-live{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  color:rgba(255,255,255,.25);
+  font-size:6px;
+  letter-spacing:.13em;
+}
+.visitor-live i{
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:currentColor;
+  display:inline-block;
+}
+.visitor-live.is-live{color:rgba(139,191,154,.68)}
 @media(max-width:700px){
-  .visitor-counter{position:absolute;left:50%;right:auto;top:50%;transform:translate(-50%,-50%);gap:8px;min-height:36px;padding:6px 9px}
-  .visitor-label{font-size:7px}
-  .visitor-counter strong{font-size:17px;min-width:22px}
-  .visitor-live{font-size:6px}
-  .visitor-live i{width:4px;height:4px}
+  .visitor-counter{
+    gap:7px;
+    font-size:6px;
+    letter-spacing:.08em;
+  }
+  .visitor-counter strong{
+    font-size:15px;
+    min-width:18px;
+  }
+  .visitor-live{font-size:5px}
+  .visitor-live i{width:3px;height:3px}
 }
