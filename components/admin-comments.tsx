@@ -25,9 +25,9 @@ export default function AdminComments(){
     setSelected(null);await load();
   }
 
-  const pending=comments.filter(c=>c.status==="pending");
+  const published=comments.filter(c=>c.status==="published");
   return <div className="admin-comments">
-    <div className="admin-toolbar"><span>{pending.length} PENDING / {comments.length} TOTAL</span></div>
+    <div className="admin-toolbar"><span>{published.length} PUBLISHED / {comments.length} TOTAL</span></div>
     {error&&<div className="result error admin-error">{error}</div>}
     <div className="admin-layout">
       <div className="submission-list">
@@ -43,7 +43,7 @@ export default function AdminComments(){
           <div className="detail-group"><label>EMAIL</label><strong>{selected.email}</strong></div>
           <div className="detail-group"><label>PROJECT</label><a href={"/project/"+selected.slug} target="_blank" rel="noreferrer">{selected.projectName} ↗</a></div>
           <div className="community-admin-copy">{selected.content}</div>
-          <div className="admin-actions">{selected.status==="pending"&&<><button className="button" onClick={()=>action(selected.id,"published")}>APPROVE & PUBLISH →</button><button className="button secondary" onClick={()=>action(selected.id,"rejected")}>REJECT</button></>}{selected.status!=="deleted"&&selected.status!=="pending"&&<button className="button danger" onClick={()=>action(selected.id,"deleted")}>DELETE</button>}</div>
+          <div className="admin-actions">{selected.status!=="deleted"&&<button className="button danger" onClick={()=>action(selected.id,"deleted")}>REMOVE COMMENT</button>}{selected.status==="pending"&&<button className="button secondary" onClick={()=>action(selected.id,"published")}>PUBLISH</button>}{selected.status==="pending"&&<button className="button secondary" onClick={()=>action(selected.id,"rejected")}>REJECT</button>}</div>
         </>:<div className="muted-detail">Select a comment.</div>}
       </div>
     </div>
