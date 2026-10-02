@@ -93,7 +93,6 @@ export default function Home() {
         <nav className="nav-links">
           <a href="#index">Explore</a>
           <a href="#categories">Categories</a>
-          <Link href="/signal">Signal</Link>
           <Link href="/submit">Submit</Link>
         </nav>
         <VisitorCounter />
