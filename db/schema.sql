@@ -40,3 +40,12 @@ create table if not exists projects (
 create index if not exists submissions_status_idx on submissions(status);
 create index if not exists projects_category_idx on projects(category);
 create index if not exists projects_created_idx on projects(created_at desc);
+
+create table if not exists visitor_visits (
+  id bigserial primary key,
+  visitor_id text not null,
+  visited_at timestamptz not null default now()
+);
+
+create index if not exists visitor_visits_visited_at_idx on visitor_visits(visited_at);
+create index if not exists visitor_visits_visitor_time_idx on visitor_visits(visitor_id, visited_at desc);
