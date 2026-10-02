@@ -76,6 +76,7 @@
 }
 
 /* Live visitor counter */
+.nav{position:relative}
 .visitor-counter{
   position:absolute;
   left:50%;
@@ -94,16 +95,15 @@
   pointer-events:none;
 }
 .visitor-counter strong{
-  font-size:8px;
+  font-size:7px;
   line-height:1;
-  font-weight:600;
+  font-weight:500;
   letter-spacing:-.025em;
   color:rgba(255,255,255,.88);
   min-width:12px;
   text-align:center;
 }
 .visitor-label{color:rgba(255,255,255,.38)}
-.visitor-label b{font-weight:400;color:rgba(255,255,255,.25)}
 .visitor-live{
   display:inline-flex;
   align-items:center;
@@ -127,7 +127,7 @@
     letter-spacing:.08em;
   }
   .visitor-counter strong{
-    font-size:7px;
+    font-size:6px;
     min-width:10px;
   }
   .visitor-live{font-size:5px}
