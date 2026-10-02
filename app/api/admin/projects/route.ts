@@ -45,13 +45,34 @@ export async function POST(request: Request) {
   const client = await pool.connect();
   try {
     await client.query("begin");
-    const submission = await client.query(
-      `insert into submissions
-       (project_name,url,normalized_url,category,description,github_url,status,verification_status,final_url,http_status,response_time_ms,hosting,review_note)
-       values ($1,$2,$2,$3,$4,$5,'approved',$6,$7,$8,$9,$10,$11)
-       returning id`,
-      [name,url,body.category||"Other",body.description||null,body.githubUrl||null,body.verificationStatus||"unverified",body.finalUrl||url,body.httpStatus||null,body.responseTimeMs||null,body.hosting||null,"ADMIN_CREATED"]
+    const existingSubmission = await client.query(
+      "select id, status from submissions where normalized_url=$1 for update",
+      [url]
     );
+
+    if (existingSubmission.rowCount && existingSubmission.rows[0].status !== "rejected") {
+      await client.query("rollback");
+      return NextResponse.json({ message: "A project with this URL already exists or is already under review." }, { status: 409 });
+    }
+
+    const submission = existingSubmission.rowCount
+      ? await client.query(
+          `update submissions set
+            project_name=$1,url=$2,normalized_url=$2,category=$3,description=$4,github_url=$5,
+            status='approved',verification_status=$6,final_url=$7,http_status=$8,response_time_ms=$9,
+            hosting=$10,review_note='ADMIN_CREATED',reviewed_at=now()
+           where id=$11
+           returning id`,
+          [name,url,body.category||"Other",body.description||null,body.githubUrl||null,body.verificationStatus||"unverified",body.finalUrl||url,body.httpStatus||null,body.responseTimeMs||null,body.hosting||null,existingSubmission.rows[0].id]
+        )
+      : await client.query(
+          `insert into submissions
+           (project_name,url,normalized_url,category,description,github_url,status,verification_status,final_url,http_status,response_time_ms,hosting,review_note)
+           values ($1,$2,$2,$3,$4,$5,'approved',$6,$7,$8,$9,$10,$11)
+           returning id`,
+          [name,url,body.category||"Other",body.description||null,body.githubUrl||null,body.verificationStatus||"unverified",body.finalUrl||url,body.httpStatus||null,body.responseTimeMs||null,body.hosting||null,"ADMIN_CREATED"]
+        );
+
     const row = await client.query(
       `insert into projects
        (submission_id,slug,project_name,url,category,description,github_url,verification_status,final_url,http_status,response_time_ms,hosting,sort_order)
