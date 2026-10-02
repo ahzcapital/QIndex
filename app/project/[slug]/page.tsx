@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { pool } from "@/lib/db";
+import Community from "@/components/community";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -47,6 +48,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <div className="detail-group"><label>PUBLIC URL</label><a href={p.url} target="_blank" rel="noreferrer">{p.url}</a></div>
       </aside>
     </section>
+
+    <Community slug={slug}/>
 
     <section className="shell claim-box fade-up-d2">
       <div><div className="eyebrow">OWNERSHIP / UPDATES</div><h2>Is this record yours?</h2><p>Owner claiming is not enabled yet. Corrections and updates currently move through the public submission and review channel.</p></div>
