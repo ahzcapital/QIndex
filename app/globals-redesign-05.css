@@ -94,12 +94,12 @@
   pointer-events:none;
 }
 .visitor-counter strong{
-  font-size:17px;
+  font-size:8px;
   line-height:1;
   font-weight:600;
   letter-spacing:-.025em;
   color:rgba(255,255,255,.88);
-  min-width:20px;
+  min-width:12px;
   text-align:center;
 }
 .visitor-label{color:rgba(255,255,255,.38)}
@@ -127,8 +127,8 @@
     letter-spacing:.08em;
   }
   .visitor-counter strong{
-    font-size:15px;
-    min-width:18px;
+    font-size:7px;
+    min-width:10px;
   }
   .visitor-live{font-size:5px}
   .visitor-live i{width:3px;height:3px}
