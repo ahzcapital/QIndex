@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import VisitorCounter from "@/components/visitor-counter";
 
 type Project = {
   slug: string;
@@ -216,7 +217,7 @@ export default function Home() {
         <div><p>Suggest a publicly accessible project. It will be checked and reviewed before publication.</p><Link href="/submit" className="btn-primary">Submit a project ↗</Link></div>
       </section>
 
-      <footer className="footer shell"><span>QINDEX / 2026</span><span>AN INDEPENDENT PUBLIC ECOSYSTEM INDEX</span><span>Q / END</span></footer>
+      <footer className="footer shell"><span>QINDEX / 2026</span><VisitorCounter /><span>Q / END</span></footer>
     </main>
   );
 }
