@@ -34,8 +34,8 @@ export default function VisitorCounter() {
   }, []);
 
   return (
-    <div className="visitor-counter" aria-live="polite" aria-label="Visits in the last 24 hours">
-      <span className="visitor-label">LAST 24 HOURS</span>
+    <div className="visitor-counter" aria-live="polite" aria-label="Visits today">
+      <span className="visitor-label">VISITS TODAY</span>
       <strong>{count === null ? "—" : count.toLocaleString()}</strong>
       <span className={"visitor-live" + (live ? " is-live" : "")}>
         <i />
