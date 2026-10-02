@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
-type Project={id:string;slug:string;projectName:string;url:string;category:string;description:string;githubUrl:string;verificationStatus:string;finalUrl:string;httpStatus:number|null;responseTimeMs:number|null;hosting:string;createdAt?:string;updatedAt?:string};
+type Project={id:string;slug:string;projectName:string;url:string;category:string;description:string;githubUrl:string;verificationStatus:string;finalUrl:string;httpStatus:number|null;responseTimeMs:number|null;hosting:string;createdAt?:string;updatedAt?:string;sortOrder?:number|null};
 type Submission=Project & {status:string;reviewNote?:string;createdAt:string;reviewedAt?:string};
 
 const categories=["Apps","Developer & Tools","AI","Finance","Social","Media & Journalism","Infrastructure","Personal","Business","Other"];
@@ -24,6 +24,7 @@ function normalizeProject(value: unknown): Project | null {
     httpStatus:typeof p.httpStatus==="number"?p.httpStatus:null,
     responseTimeMs:typeof p.responseTimeMs==="number"?p.responseTimeMs:null,
     hosting:typeof p.hosting==="string"?p.hosting:"",
+    sortOrder:typeof p.sortOrder==="number"?p.sortOrder:null,
     createdAt:typeof p.createdAt==="string"?p.createdAt:undefined,
     updatedAt:typeof p.updatedAt==="string"?p.updatedAt:undefined
   };
@@ -39,7 +40,7 @@ function normalizeSubmission(value: unknown): Submission | null {
 
 export default function AdminPage(){
   const [authed,setAuthed]=useState(false),[password,setPassword]=useState(""),[projects,setProjects]=useState<Project[]>([]),[submissions,setSubmissions]=useState<Submission[]>([]);
-  const [tab,setTab]=useState("overview"),[selected,setSelected]=useState<Project|null>(null),[selectedSubmission,setSelectedSubmission]=useState<Submission|null>(null),[form,setForm]=useState<any>(blank),[adding,setAdding]=useState(false),[saving,setSaving]=useState(false),[error,setError]=useState(""),[search,setSearch]=useState("");
+  const [tab,setTab]=useState("overview"),[selected,setSelected]=useState<Project|null>(null),[selectedSubmission,setSelectedSubmission]=useState<Submission|null>(null),[form,setForm]=useState<any>(blank),[adding,setAdding]=useState(false),[saving,setSaving]=useState(false),[error,setError]=useState(""),[search,setSearch]=useState(""),[draggedId,setDraggedId]=useState<string|null>(null),[dragOverId,setDragOverId]=useState<string|null>(null),[reordering,setReordering]=useState(false);
 
   async function load(){
     try {
@@ -107,6 +108,21 @@ export default function AdminPage(){
   }
 
   const filtered=useMemo(()=>projects.filter(p=>[p.projectName,p.url,p.category,p.description,p.hosting].join(" ").toLowerCase().includes(search.toLowerCase())),[projects,search]);
+  async function moveProject(draggedId:string,targetId:string){
+    if(draggedId===targetId||reordering||search.trim())return;
+    const from=projects.findIndex(p=>p.id===draggedId),to=projects.findIndex(p=>p.id===targetId);
+    if(from<0||to<0)return;
+    const next=[...projects], [moved]=next.splice(from,1); next.splice(to,0,moved);
+    setProjects(next);setDraggedId(null);setDragOverId(null);setReordering(true);setError("");
+    try {
+      const r=await fetch("/api/admin/projects/reorder",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({ids:next.map(p=>p.id)})});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok)throw new Error(d.message||"Could not save project order.");
+    } catch(e) {
+      setError(e instanceof Error?e.message:"Could not save project order.");
+      await load();
+    } finally { setReordering(false); }
+  }
   const pending=submissions.filter(s=>s.status==="pending");
   const rejected=submissions.filter(s=>s.status==="rejected");
   const qstorage=projects.filter(p=>p.verificationStatus==="qstorage").length;
@@ -134,7 +150,8 @@ export default function AdminPage(){
       {tab==="projects"&&<div className="admin-projects">
         <div className="admin-toolbar"><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search projects, URLs, categories…"/><span>{filtered.length} RECORDS</span></div>
         {adding||selected?<div className="admin-editor"><div className="panel-title">{adding?"ADD PROJECT":"EDIT PROJECT"} <button className="text-button" onClick={()=>{setAdding(false);setSelected(null)}}>CLOSE ×</button></div><form onSubmit={saveProject}><div className="admin-form-grid"><label>PROJECT NAME<input required value={form.projectName} onChange={e=>setForm({...form,projectName:e.target.value})}/></label><label>URL<input required type="url" value={form.url} onChange={e=>setForm({...form,url:e.target.value})}/></label><label>SLUG<input value={form.slug} onChange={e=>setForm({...form,slug:e.target.value})}/></label><label>CATEGORY<select value={form.category} onChange={e=>setForm({...form,category:e.target.value})}>{categories.map(c=><option key={c}>{c}</option>)}</select></label><label className="wide">DESCRIPTION<textarea rows={4} value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/></label><label>GITHUB URL<input value={form.githubUrl} onChange={e=>setForm({...form,githubUrl:e.target.value})}/></label><label>HOSTING SIGNAL<input value={form.hosting} onChange={e=>setForm({...form,hosting:e.target.value})}/></label><label>VERIFICATION<select value={form.verificationStatus} onChange={e=>setForm({...form,verificationStatus:e.target.value})}><option>unverified</option><option>reachable</option><option>qstorage</option></select></label><label>FINAL URL<input value={form.finalUrl} onChange={e=>setForm({...form,finalUrl:e.target.value})}/></label><label>HTTP STATUS<input value={form.httpStatus} onChange={e=>setForm({...form,httpStatus:e.target.value})}/></label><label>RESPONSE TIME<input value={form.responseTimeMs} onChange={e=>setForm({...form,responseTimeMs:e.target.value})}/></label></div><div className="admin-actions"><button className="button" disabled={saving}>{saving?"SAVING…":adding?"CREATE & PUBLISH →":"SAVE CHANGES →"}</button>{selected&&<><button type="button" className="button secondary" disabled={saving} onClick={()=>stateAction(selected.id,"unpublish")}>UNPUBLISH</button><button type="button" className="button danger" disabled={saving} onClick={()=>stateAction(selected.id,"delete")}>DELETE</button></>}</div></form></div>:null}
-        <div className="admin-project-table"><div className="admin-table-head"><span>PROJECT</span><span>CATEGORY</span><span>SIGNAL</span><span>ACTION</span></div>{filtered.map(p=><button key={p.id} className="admin-table-row" onClick={()=>openEdit(p)}><span><strong>{p.projectName}</strong><small>{p.url}</small></span><span>{p.category}</span><span>{p.verificationStatus==="qstorage"?"QSTORAGE":"REACHABLE"}</span><span>EDIT ↗</span></button>)}{!filtered.length&&<div className="admin-empty">No records match the current search.</div>}</div>
+        <div className="admin-order-note"><span>{search.trim()?"Clear search to reorder projects.":"Drag the rows using the grip to change their public order."}</span><span>{reordering?"SAVING…":""}</span></div>
+        <div className="admin-project-table"><div className="admin-table-head"><span>PROJECT</span><span>CATEGORY</span><span>SIGNAL</span><span>ACTION</span></div>{filtered.map(p=><div key={p.id} className={"admin-table-row admin-draggable-row"+(dragOverId===p.id?" drag-over":"")} draggable={!search.trim()&&!reordering} onDragStart={()=>setDraggedId(p.id)} onDragOver={e=>{if(!search.trim()&&!reordering){e.preventDefault();setDragOverId(p.id)}}} onDrop={e=>{e.preventDefault();if(draggedId)void moveProject(draggedId,p.id)}} onDragEnd={()=>{setDraggedId(null);setDragOverId(null)}}><span className="admin-project-identity"><span className="drag-grip" aria-hidden="true">⋮⋮</span><button type="button" className="admin-row-action" onClick={()=>openEdit(p)}><strong>{p.projectName}</strong><small>{p.url}</small></button></span><span>{p.category}</span><span>{p.verificationStatus==="qstorage"?"QSTORAGE":"REACHABLE"}</span><span><button type="button" className="admin-row-action" onClick={()=>openEdit(p)}>EDIT ↗</button></span></div>)}{!filtered.length&&<div className="admin-empty">No records match the current search.</div>}</div>
       </div>}
 
       {tab==="submissions"&&<div className="admin-submissions"><div className="admin-toolbar"><span>{pending.length} PENDING / {submissions.length} TOTAL</span></div><div className="admin-layout"><div className="submission-list">{submissions.map(s=><button key={s.id} className="submission-row" onClick={()=>{setSelectedSubmission(s);setSelected(null)}}><span><strong>{s.projectName}</strong><small>{s.url}</small></span><span className={"admin-status "+s.status}>{s.status}</span></button>)}{!submissions.length&&<div className="admin-empty">No submissions yet.</div>}</div><div className="submission-detail">{selectedSubmission?<><div className="eyebrow">{String(selectedSubmission.status).toUpperCase()} · {selectedSubmission.category}</div><h2>{selectedSubmission.projectName}</h2><a className="admin-url" href={selectedSubmission.url} target="_blank" rel="noreferrer">{selectedSubmission.url} ↗</a><p>{selectedSubmission.description||"No description supplied."}</p><div className="admin-facts"><div><span>HOSTING</span><strong>{selectedSubmission.hosting||"—"}</strong></div><div><span>HTTP</span><strong>{selectedSubmission.httpStatus??"—"}</strong></div><div><span>RESPONSE</span><strong>{selectedSubmission.responseTimeMs!=null?selectedSubmission.responseTimeMs+" ms":"—"}</strong></div><div><span>SIGNAL</span><strong>{selectedSubmission.verificationStatus}</strong></div></div>{selectedSubmission.githubUrl&&<div className="detail-group"><label>GITHUB</label><a href={selectedSubmission.githubUrl} target="_blank" rel="noreferrer">{selectedSubmission.githubUrl} ↗</a></div>}<div className="admin-actions">{selectedSubmission.status==="pending"&&<><button className="button" disabled={saving} onClick={()=>decide(selectedSubmission.id,"approved")}>APPROVE & PUBLISH →</button><button className="button secondary" disabled={saving} onClick={()=>decide(selectedSubmission.id,"rejected")}>REJECT</button></>}</div></>:<div className="muted-detail">Select a submission.</div>}</div></div></div>}
