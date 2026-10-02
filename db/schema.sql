@@ -33,6 +33,7 @@ create table if not exists projects (
   http_status integer,
   response_time_ms integer,
   hosting text,
+  sort_order integer,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -40,6 +41,7 @@ create table if not exists projects (
 create index if not exists submissions_status_idx on submissions(status);
 create index if not exists projects_category_idx on projects(category);
 create index if not exists projects_created_idx on projects(created_at desc);
+create index if not exists projects_sort_order_idx on projects(sort_order asc);
 
 create table if not exists visitor_visits (
   id bigserial primary key,
