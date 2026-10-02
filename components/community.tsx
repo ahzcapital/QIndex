@@ -51,7 +51,7 @@ export default function Community({ slug }: { slug:string }) {
       const r=await fetch("/api/projects/"+encodeURIComponent(slug)+"/comments",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content})});
       const d=await r.json().catch(()=>({}));
       if(!r.ok){setError(d.message||"Could not submit comment.");return}
-      setContent("");setMessage("Submitted for review. It will appear here once approved.");
+      setContent("");setComments(prev=>[...prev,d.comment]);setMessage("Your comment is now public.");
     } catch {setError("Could not connect to QIndex.");}
     finally{setBusy(false)}
   }
@@ -68,7 +68,7 @@ export default function Community({ slug }: { slug:string }) {
     </div>
 
     <div className="community-head">
-      <div><h2>Talk about the project.</h2><p>Ask questions, share experience and add useful context. Comments are reviewed before publication.</p></div>
+      <div><h2>Talk about the project.</h2><p>Ask questions, share experience and add useful context. Comments appear immediately and may be removed if they violate the community rules.</p></div>
       {user&&<div className="community-user"><span>SIGNED IN AS</span><strong>@{user.username}</strong><button onClick={logout}>SIGN OUT</button></div>}
     </div>
 
@@ -86,7 +86,7 @@ export default function Community({ slug }: { slug:string }) {
 
     {user && <form className="community-compose" onSubmit={submitComment}>
       <label>WRITE A COMMENT<textarea maxLength={2000} value={content} onChange={e=>setContent(e.target.value)} placeholder="Share a question, experience or useful context…" rows={5}/></label>
-      <div className="community-compose-foot"><span>{content.length}/2000</span><button className="button" disabled={busy||content.trim().length<2}>{busy?"SUBMITTING…":"SUBMIT FOR REVIEW →"}</button></div>
+      <div className="community-compose-foot"><span>{content.length}/2000</span><button className="button" disabled={busy||content.trim().length<2}>{busy?"SUBMITTING…":"POST COMMENT →"}</button></div>
     </form>}
 
     {message&&<div className="result success">{message}</div>}
