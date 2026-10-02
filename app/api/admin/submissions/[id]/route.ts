@@ -17,6 +17,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const client = await pool.connect();
   try {
+    await client.query(`alter table projects add column if not exists sort_order integer`);
+    await client.query(`
+      with ordered as (
+        select id, row_number() over (order by created_at asc, id asc) - 1 as position
+        from projects where sort_order is null
+      )
+      update projects p set sort_order = ordered.position
+      from ordered where p.id = ordered.id
+    `);
+
     await client.query("begin");
     const found = await client.query("select * from submissions where id=$1 for update", [id]);
     if (!found.rowCount) return NextResponse.json({ message: "Submission not found." }, { status: 404 });
@@ -30,8 +40,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       if (collision.rowCount) slug = slug + "-" + id.slice(0, 6);
       await client.query(
         `insert into projects
-        (submission_id,slug,project_name,url,category,description,github_url,verification_status,final_url,http_status,response_time_ms,hosting)
-        values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+        (submission_id,slug,project_name,url,category,description,github_url,verification_status,final_url,http_status,response_time_ms,hosting,sort_order)
+        values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,coalesce((select max(sort_order)+1 from projects),0))
         on conflict (submission_id) do update set
           project_name=excluded.project_name,url=excluded.url,category=excluded.category,description=excluded.description,
           github_url=excluded.github_url,verification_status=excluded.verification_status,final_url=excluded.final_url,
