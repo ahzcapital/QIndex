@@ -76,10 +76,47 @@
 }
 
 /* Live visitor counter */
-.visitor-counter{display:inline-flex;align-items:center;gap:12px;white-space:nowrap;font-family:var(--mono,ui-monospace,SFMono-Regular,Menlo,monospace);font-size:9px;letter-spacing:.12em;color:rgba(255,255,255,.5)}
-.visitor-counter strong{font-size:12px;font-weight:600;letter-spacing:.04em;color:rgba(255,255,255,.9);min-width:32px}
-.visitor-label{color:rgba(255,255,255,.42)}
-.visitor-live{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.32);font-size:8px}
+.visitor-counter{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  min-height:40px;
+  padding:7px 14px;
+  white-space:nowrap;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:2px;
+  background:rgba(9,10,10,.72);
+  box-shadow:0 8px 24px rgba(0,0,0,.16);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  font-family:var(--mono,ui-monospace,SFMono-Regular,Menlo,monospace);
+  font-size:8px;
+  letter-spacing:.12em;
+  color:rgba(255,255,255,.5);
+  pointer-events:none;
+}
+.visitor-counter strong{
+  font-size:20px;
+  line-height:1;
+  font-weight:600;
+  letter-spacing:-.03em;
+  color:#fff;
+  min-width:28px;
+  text-align:center;
+}
+.visitor-label{color:rgba(255,255,255,.5)}
+.visitor-live{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.36);font-size:7px;letter-spacing:.12em}
 .visitor-live i{width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block}
 .visitor-live.is-live{color:#8bbf9a}
-@media(max-width:700px){.visitor-counter{justify-self:start}.footer .visitor-counter{order:3}}
+@media(max-width:700px){
+  .visitor-counter{position:absolute;left:50%;right:auto;top:50%;transform:translate(-50%,-50%);gap:8px;min-height:36px;padding:6px 9px}
+  .visitor-label{font-size:7px}
+  .visitor-counter strong{font-size:17px;min-width:22px}
+  .visitor-live{font-size:6px}
+  .visitor-live i{width:4px;height:4px}
+}
