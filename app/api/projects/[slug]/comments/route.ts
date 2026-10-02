@@ -51,9 +51,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
 
   const inserted = await pool.query(
     `insert into qindex_comments(project_id,user_id,content,status)
-     values($1,$2,$3,'pending')
+     values($1,$2,$3,'published')
      returning id, content, created_at as "createdAt"`,
     [project.rows[0].id, user.id, content]
   );
-  return NextResponse.json({ ok: true, comment: { ...inserted.rows[0], username:user.username }, message: "Your comment was submitted for review." }, { status: 201 });
+  return NextResponse.json({ ok: true, comment: { ...inserted.rows[0], username:user.username }, message: "Your comment is now public." }, { status: 201 });
 }
