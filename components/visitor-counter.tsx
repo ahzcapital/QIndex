@@ -35,7 +35,7 @@ export default function VisitorCounter() {
 
   return (
     <div className="visitor-counter" aria-live="polite" aria-label="Visits today UTC">
-      <span className="visitor-label">VISITS TODAY (UTC)</span>
+      <span className="visitor-label">VISITS TODAY <b>(UTC)</b></span>
       <strong>{count === null ? "—" : count.toLocaleString()}</strong>
       <span className={"visitor-live" + (live ? " is-live" : "")}>
         <i />
