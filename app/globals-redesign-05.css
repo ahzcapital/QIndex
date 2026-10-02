@@ -133,3 +133,12 @@
   .visitor-live{font-size:5px}
   .visitor-live i{width:3px;height:3px}
 }
+
+/* Admin project ordering */
+.admin-order-note{display:flex;justify-content:space-between;margin:10px 0 12px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.58}
+.admin-draggable-row{cursor:grab;user-select:none}
+.admin-draggable-row:active{cursor:grabbing}
+.admin-draggable-row.drag-over{outline:1px solid currentColor;outline-offset:-1px}
+.admin-project-identity{display:flex;align-items:center;gap:12px;min-width:0}
+.drag-grip{font-size:15px;letter-spacing:-4px;opacity:.45;cursor:grab;width:14px;flex:none}
+.admin-row-action{background:none;border:0;color:inherit;font:inherit;text-align:inherit;cursor:pointer;padding:0}
