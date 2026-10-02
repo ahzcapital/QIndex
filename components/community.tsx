@@ -76,7 +76,7 @@ export default function Community({ slug }: { slug:string }) {
 
     {mode && <form className="community-auth" onSubmit={submitAuth}>
       <div className="panel-title">{mode==="register"?"CREATE QINDEX ACCOUNT":"SIGN IN"} <button type="button" className="text-button" onClick={()=>{setMode(null);resetFeedback()}}>CLOSE ×</button></div>
-      {mode==="register"&&<><label>USERNAME<input autoFocus value={username} onChange={e=>setUsername(e.target.value)} placeholder="e.g. ahmed_q"/></label><label>EMAIL<input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></label></>}
+      {mode==="register"&&<><label>USERNAME<input autoFocus value={username} onChange={e=>setUsername(e.target.value)} placeholder="joe_abc"/></label><label>EMAIL<input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></label></>}
       {mode==="login"&&<label>USERNAME OR EMAIL<input autoFocus value={identifier} onChange={e=>setIdentifier(e.target.value)} placeholder="Username or email"/></label>}
       <label>PASSWORD<input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 8 characters"/></label>
       <p className="community-note">Email verification is not required in this first version.</p>
