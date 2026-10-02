@@ -4,13 +4,26 @@ import { requireAdmin } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
+async function ensureProjectOrder(client = pool) {
+  await client.query(`alter table projects add column if not exists sort_order integer`);
+  await client.query(`
+    with ordered as (
+      select id, row_number() over (order by created_at asc, id asc) - 1 as position
+      from projects where sort_order is null
+    )
+    update projects p set sort_order = ordered.position
+    from ordered where p.id = ordered.id
+  `);
+}
+
 export async function GET() {
   if (!(await requireAdmin())) return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
+  await ensureProjectOrder();
   const result = await pool.query(
     `select id, slug, project_name as "projectName", url, category, description, github_url as "githubUrl",
       verification_status as "verificationStatus", final_url as "finalUrl", http_status as "httpStatus",
-      response_time_ms as "responseTimeMs", hosting, created_at as "createdAt", updated_at as "updatedAt"
-     from projects order by updated_at desc, created_at desc`
+      response_time_ms as "responseTimeMs", hosting, sort_order as "sortOrder", created_at as "createdAt", updated_at as "updatedAt"
+     from projects order by sort_order asc, created_at asc, id asc`
   );
   return NextResponse.json({ projects: result.rows });
 }
@@ -41,8 +54,8 @@ export async function POST(request: Request) {
     );
     const row = await client.query(
       `insert into projects
-       (submission_id,slug,project_name,url,category,description,github_url,verification_status,final_url,http_status,response_time_ms,hosting)
-       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+       (submission_id,slug,project_name,url,category,description,github_url,verification_status,final_url,http_status,response_time_ms,hosting,sort_order)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,coalesce((select max(sort_order)+1 from projects),0))
        returning id,slug,project_name as "projectName"`,
       [submission.rows[0].id,slug,name,url,body.category||"Other",body.description||null,body.githubUrl||null,body.verificationStatus||"unverified",body.finalUrl||url,body.httpStatus||null,body.responseTimeMs||null,body.hosting||null]
     );
