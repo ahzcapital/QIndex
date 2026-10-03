@@ -141,7 +141,7 @@ export default function Community({ slug }: { slug:string }) {
       <div className="backup-key-value">{generatedBackupKey}</div>
       <div className="backup-key-actions"><button className="button" onClick={copyBackupKey}>COPY KEY</button><button className="button secondary" onClick={downloadBackupKey}>DOWNLOAD</button></div>
       <div className="backup-key-warning"><strong>Important:</strong> QIndex does not store the key itself and cannot show it again. Save it somewhere secure before continuing. Anyone who has this key can reset your password.</div>
-      <button className="backup-key-confirm" onClick={()=>{setGeneratedBackupKey("");setMessage("Identity created. Your Backup Key has been saved.");}}>I'VE SAVED MY BACKUP KEY →</button>
+      <button className="backup-key-confirm" onClick={()=>{setGeneratedBackupKey("");setMode(null);setMessage("Identity created. Your Backup Key has been saved.");}}>I'VE SAVED MY BACKUP KEY →</button>
     </div>}
 
     {user && !generatedBackupKey && <form className="community-compose" onSubmit={submitComment}>
