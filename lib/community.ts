@@ -5,10 +5,14 @@ export async function ensureCommunitySchema() {
     create table if not exists qindex_users (
       id uuid primary key default gen_random_uuid(),
       username text not null unique,
-      email text not null unique,
+      email text,
       password_hash text not null,
+      backup_key_hash text,
       created_at timestamptz not null default now()
     );
+
+    alter table qindex_users alter column email drop not null;
+    alter table qindex_users add column if not exists backup_key_hash text;
 
     create table if not exists qindex_user_sessions (
       id uuid primary key default gen_random_uuid(),

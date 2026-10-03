@@ -14,6 +14,16 @@ QIndex is an independent, community-powered directory for publicly discoverable 
 - Email notification for new submissions via Resend
 - Data-honest verification: technical checks are separate from ownership and publication
 
+## Privacy-first community accounts
+
+The `privacy-auth-backup-key` branch uses a privacy-first QIndex identity model for community participation:
+
+- Username + password; no email is required for new accounts
+- A Backup Key is generated during registration for password recovery
+- The Backup Key is shown once and stored only as a hash
+- Comments can be posted immediately and may be removed by administrators
+- Existing legacy accounts with email addresses remain compatible
+
 ## Production setup
 
 The application now requires a PostgreSQL database and these Vercel environment variables:

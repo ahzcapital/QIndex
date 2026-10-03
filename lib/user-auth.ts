@@ -10,6 +10,25 @@ function hashToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
 }
 
+function normalizeBackupKey(key: string) {
+  return key.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+}
+
+export function generateBackupKey() {
+  const raw = randomBytes(12).toString("hex").toUpperCase();
+  return raw.match(/.{1,4}/g)!.join("-");
+}
+
+export function hashBackupKey(key: string) {
+  return createHash("sha256").update(normalizeBackupKey(key)).digest("hex");
+}
+
+export function verifyBackupKey(key: string, stored: string) {
+  const actual = Buffer.from(hashBackupKey(key), "hex");
+  const expected = Buffer.from(stored, "hex");
+  return actual.length === expected.length && timingSafeEqual(actual, expected);
+}
+
 export function hashPassword(password: string) {
   const salt = randomBytes(16);
   const derived = scryptSync(password, salt, 64);
@@ -36,7 +55,7 @@ export async function getCurrentUser() {
   if (!token) return null;
 
   const result = await pool.query(
-    `select u.id, u.username, u.email
+    `select u.id, u.username
      from qindex_user_sessions s
      join qindex_users u on u.id=s.user_id
      where s.token_hash=$1 and s.expires_at > now()`,

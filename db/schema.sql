@@ -58,6 +58,7 @@ create table if not exists qindex_users (
   username text not null unique,
   email text not null unique,
   password_hash text not null,
+      backup_key_hash text,
   created_at timestamptz not null default now()
 );
 
